@@ -16,12 +16,10 @@ type Device struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
-
 type CommandSet struct {
 	Command string `yaml:"command"`
 	Interval int `yaml:"interval"`
 }
-
 type MonitordConfig struct {
 	Devices []Device `yaml:"devices"`
 	Commands []CommandSet `yaml:"commands"`
@@ -45,20 +43,24 @@ func main() {
 	if err := yaml.Unmarshal(fd, &config); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n",config)
+	//fmt.Printf("%+v\n",config)
 
-		
-	for k, v := range config[0] {
-		fmt.Println("Key:", k, "Value:", v)
+	//var hosts []string
+	cfg := reflect.ValueOf(config)
+	devices := cfg.FieldByName("Devices").Interface().([]Device)
+	for _,v := range devices {
+		dev := reflect.ValueOf(v)
+		host := dev.FieldByName("Host")
+		transport := dev.FieldByName("Transport")
+		fmt.Printf("Host: %s\n",host)
+		fmt.Printf("Transport: %s\n",transport)
+		//fmt.Printf("Key: %s Value: %s\n",k,v)
 	}
-
-	
-	var hosts []string
+	/*
 	hosts = goeapi.Connections()
 	for i := 0; i<len(hosts); i++ {
 		fmt.Println(hosts[i])
 	}
-	
 	node, err := goeapi.ConnectTo("R1")
         if err != nil {
                 panic(err)
@@ -73,4 +75,5 @@ func main() {
 	for k, v := range conf[0] {
 		fmt.Println("k:", k, "v:", v)
 	}
+	*/
 }
