@@ -6,15 +6,15 @@ import (
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"reflect"
-	//"os"
         "github.com/aristanetworks/goeapi"
-        //"github.com/aristanetworks/goeapi/module"
 )
 type Device struct {
 	Host string `yaml:"host"`
 	Transport string `yaml:"transport"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	EnablePassword string `yaml:"enable_password"`
+	Port int `yaml:"port"`
 }
 type CommandSet struct {
 	Command string `yaml:"command"`
@@ -43,37 +43,36 @@ func main() {
 	if err := yaml.Unmarshal(fd, &config); err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Printf("%+v\n",config)
-
-	//var hosts []string
 	cfg := reflect.ValueOf(config)
 	devices := cfg.FieldByName("Devices").Interface().([]Device)
+	var nodes []*goeapi.Node
 	for _,v := range devices {
 		dev := reflect.ValueOf(v)
-		host := dev.FieldByName("Host")
-		transport := dev.FieldByName("Transport")
-		fmt.Printf("Host: %s\n",host)
-		fmt.Printf("Transport: %s\n",transport)
-		//fmt.Printf("Key: %s Value: %s\n",k,v)
+		host := dev.FieldByName("Host").String()
+		transport := dev.FieldByName("Transport").String()
+		port := int(dev.FieldByName("Port").Int())
+		username := dev.FieldByName("Username").String()
+		password := dev.FieldByName("Password").String()
+		enable_password := dev.FieldByName("EnablePassword").String()
+		node, err := goeapi.Connect(transport,host,username,password,port)
+		node.EnableAuthentication(enable_password)
+		if err != nil {
+			log.Fatal(err)
+		}
+		nodes = append(nodes,node)
 	}
-	/*
-	hosts = goeapi.Connections()
-	for i := 0; i<len(hosts); i++ {
-		fmt.Println(hosts[i])
-	}
-	node, err := goeapi.ConnectTo("R1")
-        if err != nil {
-                panic(err)
-        }
-
-	// get the running config and print it
 	commands := []string{"show version"}
-	conf, err := node.Enable(commands)
-	if err != nil {
-		panic(err)
+
+	for _, node := range nodes {
+		conf, err := node.RunCommands(commands,"json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(conf)
+		/*
+		for k,v := range conf[0] {
+			fmt.Println("k:", k, "v:", v)
+		}
+		*/
 	}
-	for k, v := range conf[0] {
-		fmt.Println("k:", k, "v:", v)
-	}
-	*/
 }

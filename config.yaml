@@ -1,6 +1,6 @@
 devices:
-   - { host: R1, transport: http, username: admin, password: admin, port: 80 }
-   - { host: R2, transport: http, username: admin, password: admin, port: 80 }
+   - { host: R1, transport: http, username: admin, password: admin, enable_password: admin, port: 80 }
+   - { host: R2, transport: http, username: admin, password: admin, enable_password: admin, port: 80 }
 commands:
    - {command: "show version", interval: 10}
    - {command: "show ip interface brief", interval: 30}
