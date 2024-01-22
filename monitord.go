@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"reflect"
         "github.com/aristanetworks/goeapi"
+	"time"
 )
 type Device struct {
 	Host string `yaml:"host"`
@@ -34,6 +35,26 @@ func CreateConnection(device Device) (*goeapi.Node, error) {
 		int(v.FieldByName("Port").Int()))
 	return node, err
 }
+func monitor(node *goeapi.Node, cmds map[string]int) {
+	fmt.Printf("Monitoring node %s\n",node)
+	var last_ran map[string]time.Time
+	last_ran = make(map[string]time.Time)
+	for k,_ := range cmds {
+		last_ran[k] = time.Now()
+	}
+	for {
+		for k,_ := range last_ran {
+			if time.Now().After(last_ran[k].Add(time.Second * time.Duration(cmds[k]))) {
+				command := []string{k}
+				_, err := node.Enable(command)
+				if err != nil {
+					log.Fatal(err)
+				}
+				last_ran[k] = time.Now()
+			}
+		}
+	}
+}
 func main() {
 	fd, err := ioutil.ReadFile("./config.yaml")
 	if err != nil {
@@ -45,6 +66,7 @@ func main() {
 	}
 	cfg := reflect.ValueOf(config)
 	devices := cfg.FieldByName("Devices").Interface().([]Device)
+	var commands []CommandSet
 	var nodes []*goeapi.Node
 	for _,v := range devices {
 		dev := reflect.ValueOf(v)
@@ -61,18 +83,15 @@ func main() {
 		}
 		nodes = append(nodes,node)
 	}
-	commands := []string{"show version"}
-
-	for _, node := range nodes {
-		conf, err := node.RunCommands(commands,"json")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(conf)
-		/*
-		for k,v := range conf[0] {
-			fmt.Println("k:", k, "v:", v)
-		}
-		*/
+	commands = cfg.FieldByName("Commands").Interface().([]CommandSet)
+	var cmds map[string]int
+	cmds = make(map[string]int)
+	for _,v := range commands {
+		cmd := reflect.ValueOf(v)
+		cmds[cmd.FieldByName("Command").String()] = int(cmd.FieldByName("Interval").Int())
 	}
+	for _,v := range nodes {
+		go monitor(v,cmds)
+	}
+	select{}
 }
