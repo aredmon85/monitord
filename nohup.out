@@ -1,7 +1,0 @@
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc420085680  R2 80  0xc4201761e0 60 false}})   %!s(bool=true) admin }
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc420184050  R1 80  0xc420087560 60 false}})   %!s(bool=true) admin }
-2024/01/23 22:48:22 JSON Error(1000): CLI command 2 of 2 'show ip mroute count' failed: could not run command
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc4201860b0  R2 80  0xc4201ba000 60 false}})   %!s(bool=true) admin }
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc420186050  R1 80  0xc42008d560 60 false}})   %!s(bool=true) admin }
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc4201b4050  R2 80  0xc420176000 60 false}})   %!s(bool=true) admin }
-Monitoring node &{%!s(*goeapi.HTTPEapiConnection=&{{http 0xc420011630  R1 80  0xc420085560 60 false}})   %!s(bool=true) admin }
