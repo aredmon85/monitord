@@ -5,3 +5,6 @@ commands:
    - {command: "show version", interval: 10}
    - {command: "show ip interface brief", interval: 30}
    - {command: "show vlan", interval: 30}
+   - {command: "show ip bgp summary", interval: 5}
+   - {command: "show ntp associations", interval: 30}
+   - {command: "show clock", interval: 60}

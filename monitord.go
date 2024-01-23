@@ -53,6 +53,7 @@ func monitor(node *goeapi.Node, cmds map[string]int) {
 				last_ran[k] = time.Now()
 			}
 		}
+		time.Sleep(1 * time.Second)
 	}
 }
 func main() {
